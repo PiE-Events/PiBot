@@ -64,8 +64,7 @@ class Main {
                 }
                 topic.publish("test")
             }
-
-
+            println("PiBot is running!")
 
             Runtime.getRuntime().addShutdownHook(Thread {
                 redisson.shutdown()
