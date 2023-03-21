@@ -8,7 +8,8 @@ import java.awt.Color
 
 class Discord {
     companion object {
-        private var jda: JDA? = null
+        var jda: JDA? = null
+        var guildID = 903380581117751406
     }
     fun connect(token: String) {
         jda = JDABuilder.createDefault(token)

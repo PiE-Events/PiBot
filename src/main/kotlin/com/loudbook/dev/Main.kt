@@ -1,5 +1,6 @@
 package com.loudbook.dev
 
+import com.loudbook.dev.scavangerhunt.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.redisson.Redisson
@@ -37,6 +38,14 @@ class Main {
             discord = Discord()
             discord!!.connect(token!!)
 
+            val clueManager = ClueManager()
+            val clueParser = ClueParser(clueManager)
+            clueParser.run()
+            val teamManager = TeamManager()
+            Discord.jda!!.addEventListener(AnswerCommand(clueManager))
+            Discord.jda!!.addEventListener(StartEvertCommand(teamManager, clueManager))
+            Discord.jda!!.addEventListener(ResetEventCommand(teamManager, clueManager, clueParser))
+            Discord.jda!!.addEventListener(TeamCommand(teamManager))
 /*            launch {
                 val topic: RTopic = redisson.getTopic("mcmessage")
                 topic.addListener(
