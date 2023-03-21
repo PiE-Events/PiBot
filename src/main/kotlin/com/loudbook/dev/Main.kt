@@ -30,14 +30,14 @@ class Main {
             }
 
             val config = Config()
-            config.useSingleServer()
-                .address = uri
-            val redisson = Redisson.create(config)
+/*            config.useSingleServer()
+                .address = uri*/
+//            val redisson = Redisson.create(config)
 
             discord = Discord()
             discord!!.connect(token!!)
 
-            launch {
+/*            launch {
                 val topic: RTopic = redisson.getTopic("mcmessage")
                 topic.addListener(
                     String::class.java
@@ -63,12 +63,12 @@ class Main {
                     }
                 }
                 topic.publish("test")
-            }
+            }*/
             println("PiBot is running!")
 
-            Runtime.getRuntime().addShutdownHook(Thread {
+/*            Runtime.getRuntime().addShutdownHook(Thread {
                 redisson.shutdown()
-            })
+            })*/
         }
     }
 }
