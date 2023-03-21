@@ -8,7 +8,6 @@ class ResetEventCommand(private val teamManager: TeamManager,
                         private val clueParser: ClueParser) : ListenerAdapter() {
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if (event.interaction.name == "reset") {
-            event.interaction.reply("Resetting event...").queue()
             teamManager.teams.forEach { it ->
                 it.members.forEach {
                     teamManager.getTeam(it)!!.removeMember(it)

@@ -36,4 +36,10 @@ class Team(val voiceChannel: VoiceChannel, val textChannel: TextChannel, val nam
             EnumSet.of(Permission.VIEW_CHANNEL))
             .queue()
     }
+
+    fun clearMembers() {
+        for (member in members) {
+            removeMember(member)
+        }
+    }
 }

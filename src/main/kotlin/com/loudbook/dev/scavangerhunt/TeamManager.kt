@@ -29,7 +29,7 @@ class TeamManager {
             e.printStackTrace()
         }
         var voice: VoiceChannel = jda.getVoiceChannelsByName(teamName, true)[0]
-        var text: TextChannel = jda.getTextChannelsByName(teamName, true)[0]
+        var text: TextChannel = jda.getTextChannelsByName(teamName.replace(" ", "-"), true)[0]
 
         val team = Team(voice,
             text,
@@ -38,7 +38,6 @@ class TeamManager {
 
         team.addMember(leader)
         this.teams.add(team)
-        println(this.teams)
     }
 
     fun getTeam(voiceChannel: VoiceChannel): Team? {

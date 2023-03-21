@@ -17,12 +17,16 @@ class ClueParser(private val manager: ClueManager) : Runnable {
                 Integer.valueOf(str.substring(str.indexOf("[") + 1,
                     str.indexOf("]")).replace("Clue ", ""))
             val answers: MutableList<String> = ArrayList(
-                str.substring(str.indexOf("[Answer]") + 1).split("|"))
-
+                str.split("[Answer]")[1].split("|"))
             for ((i, answer) in answers.withIndex()) {
                 answers[i] = answer.trim()
             }
-            manager.clues.add(Clue(cluenum, message.contentRaw, answers))
+
+            var clue = message.contentRaw
+            clue = clue.split("[Answer]")[0]
+            clue = clue.replace("[Clue $cluenum]", "**Clue #$cluenum**", true)
+            manager.clues.add(Clue(cluenum, clue, answers))
         }
+        manager.clues.reverse()
     }
 }

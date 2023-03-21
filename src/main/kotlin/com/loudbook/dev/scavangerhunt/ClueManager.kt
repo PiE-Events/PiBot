@@ -10,7 +10,7 @@ import kotlin.math.log
 class ClueManager {
     val clues: MutableList<Clue> = ArrayList()
     private val jda = Discord.jda
-    private val activeClues: MutableMap<TextChannel, Clue> = HashMap()
+    val activeClues: MutableMap<TextChannel, Clue> = HashMap()
     private val possibleAnswers: List<String> = listOf("You got it!", "Good job!", "Amazing!", "Correct!")
     private val possibleNopes: List<String> = listOf("Nope!", "That's not it...", "Luke disapproves.", "Nuh-uh.")
     private var currentWinners = 0
@@ -43,29 +43,31 @@ class ClueManager {
             return
         }
 
-        val answer = interaction.getOption("answer")?.asString
+        var answer = interaction.getOption("answer")?.asString
 
         if (answer == null) {
             interaction.reply("You must provide an answer!").queue()
             return
         }
 
+        answer = answer.replace("[", "").replace("]", "")
+
         if (clue.isAnswer(answer)) {
             interaction.reply(possibleAnswers.random()).queue()
             val nextClue = getClueByNumber(clue.number + 1)
             if (nextClue == null) {
-                interaction.reply("You have completed the scavenger hunt! You are team #$currentWinners to finish.").queue()
-                answerLogChannel!!.sendMessage("Team ${channel.name} has completed the scavenger hunt in place #$currentWinners").queue()
+                interaction.reply(":tada: You have completed the scavenger hunt! You are team **#$currentWinners** to finish. :tada:").queue()
+                answerLogChannel!!.sendMessage(":tada: Team **${channel.name}** has completed the scavenger hunt in place **#$currentWinners**").queue()
                 interaction.channel.delete().queue()
                 currentWinners++
                 return
             }
 
             if (!clue.answered) {
-                progressLogChannel!!.sendMessage(":tada: Team ${channel.name} has completed clue ${clue.number} first! :tada:").queue()
+                progressLogChannel!!.sendMessage(":tada: Team **${channel.name}** has completed **Clue ${clue.number}** first! :tada:").queue()
                 clue.answered = true
             } else {
-                progressLogChannel!!.sendMessage("Team ${channel.name} has completed clue ${clue.number}.").queue()
+                progressLogChannel!!.sendMessage(":white_check_mark: Team ${channel.name} has completed clue ${clue.number}.").queue()
             }
 
             logChannel!!.sendMessage("Team ${channel.name} has completed clue ${clue.number}.").queue()
@@ -73,6 +75,7 @@ class ClueManager {
             interaction.channel.sendMessage(nextClue.message).queue()
         } else {
             interaction.reply(possibleNopes.random()).queue()
+            logChannel!!.sendMessage(":x: Team **${channel.name}** guessed **$answer** for **Clue ${clue.number}**").queue()
         }
     }
 }

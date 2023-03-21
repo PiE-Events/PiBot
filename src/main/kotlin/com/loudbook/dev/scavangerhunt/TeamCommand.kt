@@ -35,7 +35,7 @@ class TeamCommand(private val teamManager: TeamManager) : ListenerAdapter() {
                 return
             }
             event.reply("${event.interaction.options[0].asUser.asMention} you have been invited to join **${teamManager.getTeam(event.interaction.user)!!.name}**!")
-                .addActionRow(Button.secondary("accept", "Accept"))
+                .addActionRow(Button.success("accept", "Accept"))
                 .queue()
             map[event.interaction.options[0].asUser] = teamManager.getTeam(event.interaction.user)!!
         }
@@ -47,14 +47,15 @@ class TeamCommand(private val teamManager: TeamManager) : ListenerAdapter() {
             if (teamManager.getTeam(event.interaction.user)!!.leader == event.interaction.user) {
                 event.interaction.reply("You are the leader of this team, and it has been disbanded!").queue()
                 teamManager.getTeam(event.interaction.user)!!.members.forEach {
-                    teamManager.getTeam(event.interaction.user)!!.removeMember(it)
                     event.interaction.channel.sendMessage(
                         "${it.asMention} you have been removed from **${teamManager.getTeam(event.interaction.user)!!.name}**!").queue()
                 }
+                teamManager.getTeam(event.interaction.user)!!.clearMembers()
+                teamManager.teams.remove(teamManager.getTeam(event.interaction.user)!!)
                 return
             } else {
-                teamManager.getTeam(event.interaction.user)!!.removeMember(event.interaction.user)
                 event.interaction.reply("You have left **${teamManager.getTeam(event.interaction.user)!!.name}**!").queue()
+                teamManager.getTeam(event.interaction.user)!!.removeMember(event.interaction.user)
             }
         }
         if (event.interaction.name == "teamlist") {
@@ -62,11 +63,11 @@ class TeamCommand(private val teamManager: TeamManager) : ListenerAdapter() {
                 event.interaction.reply("You are not in a team!").queue()
                 return
             }
-            event.interaction.reply("Members of **${teamManager.getTeam(event.interaction.user)!!.name}**:\n" +
+            event.interaction.reply("Members of **${teamManager.getTeam(event.interaction.user)!!.name}**:\n • " +
                     teamManager.getTeam(event.interaction.user)!!.members.joinToString("\n • ") { it.name }).queue()
         }
         if (event.interaction.name == "allteamlist") {
-            event.interaction.reply("All teams:\n" +
+            event.interaction.reply("All teams:\n • " +
                     teamManager.teams.joinToString("\n • ") { it.name }).queue()
         }
     }

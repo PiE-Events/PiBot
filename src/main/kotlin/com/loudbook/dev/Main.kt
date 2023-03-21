@@ -75,9 +75,13 @@ class Main {
             }*/
             println("PiBot is running!")
 
-/*            Runtime.getRuntime().addShutdownHook(Thread {
-                redisson.shutdown()
-            })*/
+            Runtime.getRuntime().addShutdownHook(Thread {
+                for (team in teamManager.teams) {
+                    team.textChannel.delete().queue()
+                    team.voiceChannel.delete().queue()
+                    Discord.jda!!.shutdown()
+                }
+            })
         }
     }
 }
