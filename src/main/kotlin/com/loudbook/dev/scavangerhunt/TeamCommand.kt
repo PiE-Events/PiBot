@@ -1,18 +1,15 @@
 package com.loudbook.dev.scavangerhunt
 
-import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import net.dv8tion.jda.api.interactions.components.Component
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 
 class TeamCommand(private val teamManager: TeamManager) : ListenerAdapter() {
     private val map = mutableMapOf<User, Team>()
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if (event.interaction.name == "teamcreate") {
-            event.reply(":tada: Team **${event.interaction.options[0].asString}** has been created!").queue()
             if (teamManager.getTeam(event.interaction.user) != null) {
                 event.interaction.reply("You are already in a team!").queue()
                 return
@@ -22,6 +19,7 @@ class TeamCommand(private val teamManager: TeamManager) : ListenerAdapter() {
                 return
             }
             teamManager.addTeam(event.interaction.options[0].asString, event.interaction.user)
+            event.reply(":tada: Team **${event.interaction.options[0].asString}** has been created!").queue()
         }
         if (event.interaction.name == "invite") {
             if (teamManager.getTeam(event.interaction.user) == null) {
@@ -36,12 +34,12 @@ class TeamCommand(private val teamManager: TeamManager) : ListenerAdapter() {
                 event.interaction.reply("That user is already in a team!").queue()
                 return
             }
-            event.reply("${event.interaction.options[0].asUser.asMention} you have been invited to join ${teamManager.getTeam(event.interaction.user)!!.name}!")
-                .addActionRow(Button.primary("accept", "Accept"))
+            event.reply("${event.interaction.options[0].asUser.asMention} you have been invited to join **${teamManager.getTeam(event.interaction.user)!!.name}**!")
+                .addActionRow(Button.success("accept", "Accept"))
                 .queue()
             map[event.interaction.options[0].asUser] = teamManager.getTeam(event.interaction.user)!!
         }
-        if (event.interaction.name == "leaveteam") {
+        if (event.interaction.name == "teamleave") {
             if (teamManager.getTeam(event.interaction.user) == null) {
                 event.interaction.reply("You are not in a team!").queue()
                 return
@@ -49,15 +47,28 @@ class TeamCommand(private val teamManager: TeamManager) : ListenerAdapter() {
             if (teamManager.getTeam(event.interaction.user)!!.leader == event.interaction.user) {
                 event.interaction.reply("You are the leader of this team, and it has been disbanded!").queue()
                 teamManager.getTeam(event.interaction.user)!!.members.forEach {
-                    teamManager.getTeam(event.interaction.user)!!.removeMember(it)
                     event.interaction.channel.sendMessage(
-                        "${it.asMention} you have been removed from ${teamManager.getTeam(event.interaction.user)!!.name}!").queue()
+                        "${it.asMention} you have been removed from **${teamManager.getTeam(event.interaction.user)!!.name}**!").queue()
                 }
+                teamManager.getTeam(event.interaction.user)!!.clearMembers()
+                teamManager.teams.remove(teamManager.getTeam(event.interaction.user)!!)
                 return
             } else {
+                event.interaction.reply("You have left **${teamManager.getTeam(event.interaction.user)!!.name}**!").queue()
                 teamManager.getTeam(event.interaction.user)!!.removeMember(event.interaction.user)
-                event.interaction.reply("You have left ${teamManager.getTeam(event.interaction.user)!!.name}!").queue()
             }
+        }
+        if (event.interaction.name == "teamlist") {
+            if (teamManager.getTeam(event.interaction.user) == null) {
+                event.interaction.reply("You are not in a team!").queue()
+                return
+            }
+            event.interaction.reply("Members of **${teamManager.getTeam(event.interaction.user)!!.name}**:\n • " +
+                    teamManager.getTeam(event.interaction.user)!!.members.joinToString("\n • ") { it.name }).queue()
+        }
+        if (event.interaction.name == "allteamlist") {
+            event.interaction.reply("All teams:\n • " +
+                    teamManager.teams.joinToString("\n • ") { it.name }).queue()
         }
     }
 
@@ -67,7 +78,7 @@ class TeamCommand(private val teamManager: TeamManager) : ListenerAdapter() {
             return
         }
         map[event.interaction.user]!!.addMember(event.interaction.user)
-        event.interaction.reply("${event.interaction.user.asMention} has joined ${map[event.interaction.user]!!.name}!").queue()
+        event.interaction.reply("${ map[event.interaction.user]!!.leader.asMention}, ${event.user.name} has joined **${map[event.interaction.user]!!.name}**!").queue()
         map.remove(event.interaction.user)
     }
 }
