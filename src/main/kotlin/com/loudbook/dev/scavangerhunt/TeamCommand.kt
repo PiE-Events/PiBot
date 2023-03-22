@@ -18,6 +18,10 @@ class TeamCommand(private val teamManager: TeamManager) : ListenerAdapter() {
                 event.interaction.reply("That team already exists!").queue()
                 return
             }
+            if (!isLetters(event.interaction.options[0].asString)) {
+                event.interaction.reply("Team names can only contain letters!").queue()
+                return
+            }
             teamManager.addTeam(event.interaction.options[0].asString, event.interaction.user)
             event.reply(":tada: Team **${event.interaction.options[0].asString}** has been created!").queue()
         }
@@ -70,6 +74,10 @@ class TeamCommand(private val teamManager: TeamManager) : ListenerAdapter() {
             event.interaction.reply("All teams:\n • " +
                     teamManager.teams.joinToString("\n • ") { it.name }).queue()
         }
+    }
+
+    fun isLetters(string: String): Boolean {
+        return string.filter { it in 'A'..'Z' || it in 'a'..'z' || it in " "  }.length == string.length
     }
 
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
