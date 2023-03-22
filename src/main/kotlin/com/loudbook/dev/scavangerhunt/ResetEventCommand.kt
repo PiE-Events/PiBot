@@ -10,8 +10,13 @@ class ResetEventCommand(private val teamManager: TeamManager,
         if (event.interaction.name == "reset") {
             teamManager.teams.clear()
             clueManager.clues.clear()
+            for (team in teamManager.teams) {
+                team.textChannel.delete().complete()
+                team.voiceChannel.delete().complete()
+            }
+            clueManager.started = false
             clueParser.run()
-            event.interaction.reply("Event has been reset!").queue()
+            event.hook.sendMessage("Event has been reset!").queue()
         }
     }
 }

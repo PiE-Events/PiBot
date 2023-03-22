@@ -6,6 +6,9 @@ import kotlinx.coroutines.runBlocking
 import org.redisson.Redisson
 import org.redisson.api.RTopic
 import org.redisson.config.Config
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.slf4j.spi.SLF4JServiceProvider
 import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
@@ -18,6 +21,7 @@ class Main {
         private var discord: Discord? = null
         @JvmStatic
         fun main(args: Array<String>) = runBlocking {
+            System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "Warn");
             try {
                 FileInputStream("./config.properties").use { input ->
                     val prop = Properties()
@@ -35,17 +39,17 @@ class Main {
                 .address = uri*/
 //            val redisson = Redisson.create(config)
 
-            discord = Discord()
-            discord!!.connect(token!!)
+            val discord = Discord()
+            discord.connect(token!!)
 
-            val clueManager = ClueManager()
-            val clueParser = ClueParser(clueManager)
+            val teamManager = TeamManager(discord.jda)
+            val clueManager = ClueManager(discord.jda, teamManager)
+            val clueParser = ClueParser(clueManager, discord.jda)
             clueParser.run()
-            val teamManager = TeamManager()
-            Discord.jda!!.addEventListener(AnswerCommand(clueManager))
-            Discord.jda!!.addEventListener(StartEvertCommand(teamManager, clueManager))
-            Discord.jda!!.addEventListener(ResetEventCommand(teamManager, clueManager, clueParser))
-            Discord.jda!!.addEventListener(TeamCommand(teamManager))
+            discord.jda.addEventListener(AnswerCommand(clueManager))
+            discord.jda.addEventListener(StartEvertCommand(teamManager, clueManager))
+            discord.jda.addEventListener(ResetEventCommand(teamManager, clueManager, clueParser))
+            discord.jda.addEventListener(TeamCommand(teamManager, clueManager))
 /*            launch {
                 val topic: RTopic = redisson.getTopic("mcmessage")
                 topic.addListener(
@@ -77,10 +81,10 @@ class Main {
 
             Runtime.getRuntime().addShutdownHook(Thread {
                 for (team in teamManager.teams) {
-                    team.textChannel.delete().queue()
-                    team.voiceChannel.delete().queue()
-                    Discord.jda!!.shutdown()
+                    team.textChannel.delete().complete()
+                    team.voiceChannel.delete().complete()
                 }
+                discord.jda.shutdown()
             })
         }
     }

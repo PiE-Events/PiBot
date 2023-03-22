@@ -1,92 +1,115 @@
 package com.loudbook.dev.scavangerhunt
 
+import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.components.buttons.Button
+import java.util.*
 
-class TeamCommand(private val teamManager: TeamManager) : ListenerAdapter() {
+class TeamCommand(private val teamManager: TeamManager, private val clueManager: ClueManager) : ListenerAdapter() {
     private val map = mutableMapOf<User, Team>()
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
+        event.deferReply().queue()
         if (event.interaction.name == "teamcreate") {
-            if (teamManager.getTeam(event.interaction.user) != null) {
-                event.interaction.reply("You are already in a team!").queue()
+            if (clueManager.started) {
+                event.hook.sendMessage("The event has started already!").queue()
                 return
             }
-            if (teamManager.jda!!.getVoiceChannelsByName(event.interaction.options[0].asString, true).isNotEmpty()) {
-                event.interaction.reply("That team already exists!").queue()
+            if (teamManager.getTeam(event.interaction.user) != null) {
+                event.hook.sendMessage("You are already in a team!").queue()
+                return
+            }
+            if (teamManager.jda.getVoiceChannelsByName(event.interaction.options[0].asString, true).isNotEmpty()) {
+                event.hook.sendMessage("That team already exists!").queue()
                 return
             }
             if (!isLetters(event.interaction.options[0].asString)) {
-                event.interaction.reply("Team names can only contain letters!").queue()
+                event.hook.sendMessage("Team names can only contain letters!").queue()
+                return
+            }
+            if (event.interaction.options[0].asString.length > 100) {
+                event.hook.sendMessage("That name is long. Too long.").queue()
                 return
             }
             teamManager.addTeam(event.interaction.options[0].asString, event.interaction.user)
-            event.reply(":tada: Team **${event.interaction.options[0].asString}** has been created!").queue()
+            event.hook.sendMessage(":tada: Team **${event.interaction.options[0].asString}** has been created!").queue()
         }
         if (event.interaction.name == "invite") {
+            if (clueManager.started) {
+                event.hook.sendMessage("The event has started already!").queue()
+                return
+            }
             if (teamManager.getTeam(event.interaction.user) == null) {
-                event.interaction.reply("You are not in a team!").queue()
+                event.hook.sendMessage("You are not in a team!").queue()
                 return
             }
             if (teamManager.getTeam(event.interaction.user)!!.leader != event.interaction.user) {
-                event.interaction.reply("You are not the leader of your team!").queue()
+                event.hook.sendMessage("You are not the leader of your team!").queue()
                 return
             }
             if (teamManager.getTeam(event.interaction.options[0].asUser) != null) {
-                event.interaction.reply("That user is already in a team!").queue()
+                event.hook.sendMessage("That user is already in a team!").queue()
                 return
             }
-            event.reply("${event.interaction.options[0].asUser.asMention} you have been invited to join **${teamManager.getTeam(event.interaction.user)!!.name}**!")
+            if (teamManager.getTeam(event.interaction.user)!!.members.size >= 3) {
+                event.hook.sendMessage("Your team is full!").queue()
+                return
+            }
+            event.hook.sendMessage("${event.interaction.options[0].asUser.asMention}, you have been invited to join **${teamManager.getTeam(event.interaction.user)!!.name}**!")
                 .addActionRow(Button.success("accept", "Accept"))
                 .queue()
             map[event.interaction.options[0].asUser] = teamManager.getTeam(event.interaction.user)!!
         }
         if (event.interaction.name == "teamleave") {
             if (teamManager.getTeam(event.interaction.user) == null) {
-                event.interaction.reply("You are not in a team!").queue()
+                event.hook.sendMessage("You are not in a team!").queue()
                 return
             }
             if (teamManager.getTeam(event.interaction.user)!!.leader == event.interaction.user) {
-                event.interaction.reply("You are the leader of this team, and it has been disbanded!").queue()
-                teamManager.getTeam(event.interaction.user)!!.members.forEach {
+                val team = teamManager.getTeam(event.interaction.user)!!
+                event.hook.sendMessage("You are the leader of this team, and it has been disbanded!").queue()
+                team.members.forEach {
                     event.interaction.channel.sendMessage(
-                        "${it.asMention} you have been removed from **${teamManager.getTeam(event.interaction.user)!!.name}**!").queue()
+                        "${it.asMention} you have been removed from **${team.name}**!"
+                    ).queue()
                 }
-                teamManager.getTeam(event.interaction.user)!!.clearMembers()
-                teamManager.teams.remove(teamManager.getTeam(event.interaction.user)!!)
+                team.clearMembers()
+                teamManager.teams.remove(team)
+                team.textChannel.delete().queue()
+                team.voiceChannel.delete().queue()
                 return
             } else {
-                event.interaction.reply("You have left **${teamManager.getTeam(event.interaction.user)!!.name}**!").queue()
+                event.hook.sendMessage("You have left **${teamManager.getTeam(event.interaction.user)!!.name}**!").queue()
                 teamManager.getTeam(event.interaction.user)!!.removeMember(event.interaction.user)
             }
         }
         if (event.interaction.name == "teamlist") {
             if (teamManager.getTeam(event.interaction.user) == null) {
-                event.interaction.reply("You are not in a team!").queue()
+                event.hook.sendMessage("You are not in a team!").queue()
                 return
             }
-            event.interaction.reply("Members of **${teamManager.getTeam(event.interaction.user)!!.name}**:\n • " +
+            event.hook.sendMessage("Members of **${teamManager.getTeam(event.interaction.user)!!.name}**:\n • " +
                     teamManager.getTeam(event.interaction.user)!!.members.joinToString("\n • ") { it.name }).queue()
         }
         if (event.interaction.name == "allteamlist") {
-            event.interaction.reply("All teams:\n • " +
+            event.hook.sendMessage("All teams:\n • " +
                     teamManager.teams.joinToString("\n • ") { it.name }).queue()
         }
     }
 
-    fun isLetters(string: String): Boolean {
+    private fun isLetters(string: String): Boolean {
         return string.filter { it in 'A'..'Z' || it in 'a'..'z' || it in " "  }.length == string.length
     }
 
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
         if (!map.containsKey(event.user)) {
-            event.interaction.reply("That's not valid...").queue()
+            event.reply("That's not valid...").setEphemeral(true).queue()
             return
         }
         map[event.interaction.user]!!.addMember(event.interaction.user)
-        event.interaction.reply("${ map[event.interaction.user]!!.leader.asMention}, ${event.user.name} has joined **${map[event.interaction.user]!!.name}**!").queue()
+        event.reply("${ map[event.interaction.user]!!.leader.asMention}, ${event.user.name} has joined **${map[event.interaction.user]!!.name}**!").queue()
         map.remove(event.interaction.user)
     }
 }

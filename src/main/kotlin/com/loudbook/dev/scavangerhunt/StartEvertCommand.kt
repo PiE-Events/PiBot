@@ -2,17 +2,20 @@ package com.loudbook.dev.scavangerhunt
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import java.util.concurrent.TimeUnit
 
 class StartEvertCommand(private val teamManager: TeamManager, private val clueManager: ClueManager) : ListenerAdapter() {
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if (event.interaction.name == "start") {
             for (team in teamManager.teams) {
-                team.textChannel.sendMessage("Let the games begin! " +
+                team.textChannel.sendMessage("Get ready! The hunt will start in **30** seconds. " +
+                        "You will be competing against **${teamManager.teams.size-1}** other teams. " +
                         team.members.joinToString(", ") { it.asMention }).queue()
-                team.textChannel.sendMessage(clueManager.clues[0].message).queue()
+                team.textChannel.sendMessage(clueManager.clues[0].message).queueAfter(30000, TimeUnit.MILLISECONDS)
                 clueManager.activeClues[team.textChannel] = clueManager.clues[0]
             }
-            event.interaction.reply("Event has started!").queue()
+            clueManager.started = true
+            event.hook.sendMessage("Event has started!").queue()
         }
     }
 }

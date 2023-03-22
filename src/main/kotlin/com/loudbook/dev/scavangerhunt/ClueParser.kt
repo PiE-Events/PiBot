@@ -1,13 +1,14 @@
 package com.loudbook.dev.scavangerhunt
 
 import com.loudbook.dev.Discord
+import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageHistory
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 
 
-class ClueParser(private val manager: ClueManager) : Runnable {
-    private val channel = Discord.jda!!.getTextChannelById("1087472366608732281") as TextChannel
+class ClueParser(private val manager: ClueManager, jda: JDA) : Runnable {
+    private val channel = jda.getTextChannelById("1087472366608732281") as TextChannel
     override fun run() {
         val history = MessageHistory.getHistoryFromBeginning(channel).complete()
         val messages: List<Message> = history.retrievedHistory
