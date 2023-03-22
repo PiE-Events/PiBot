@@ -74,7 +74,7 @@ class TeamCommand(private val teamManager: TeamManager) : ListenerAdapter() {
 
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
         if (!map.containsKey(event.user)) {
-            event.interaction.reply("That's no longer valid!").queue()
+            event.interaction.reply("That's not valid...").queue()
             return
         }
         map[event.interaction.user]!!.addMember(event.interaction.user)
