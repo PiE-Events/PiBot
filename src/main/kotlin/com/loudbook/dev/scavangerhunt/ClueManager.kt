@@ -124,8 +124,8 @@ class ClueManager(jda: JDA, val teamManager: TeamManager) {
             interaction.hook.sendMessage(possibleNopes.random()).queue()
             val eb = EmbedBuilder()
             eb.setDescription("${interaction.user.asMention} on team **${team.name}** guessed **$answer** for **Clue ${clue.number}**")
-            eb.setColor(Color.RED)
-            logChannel.sendMessageEmbeds(eb.build()).queue()
+            eb.setColor(Color.GRAY)
+            answerLogChannel.sendMessageEmbeds(eb.build()).queue()
         }
     }
 }
