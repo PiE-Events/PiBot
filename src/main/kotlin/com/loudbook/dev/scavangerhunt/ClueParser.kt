@@ -1,15 +1,14 @@
 package com.loudbook.dev.scavangerhunt
 
-import com.loudbook.dev.Discord
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageHistory
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 
 
-class ClueParser(private val manager: ClueManager, jda: JDA) : Runnable {
+class ClueParser(private val manager: ClueManager, jda: JDA) {
     private val channel = jda.getTextChannelById("1087472366608732281") as TextChannel
-    override fun run() {
+    fun run(reAdd: Boolean = false) {
         val history = MessageHistory.getHistoryFromBeginning(channel).complete()
         val messages: List<Message> = history.retrievedHistory
         for (message in messages) {
@@ -26,8 +25,19 @@ class ClueParser(private val manager: ClueManager, jda: JDA) : Runnable {
             var clue = message.contentRaw
             clue = clue.split("[Answer]")[0]
             clue = clue.replace("[Clue $cluenum]", "**Clue #$cluenum**", true)
-            manager.clues.add(Clue(cluenum, clue, answers))
+            if (reAdd) {
+                for (clue1 in manager.clues) {
+                    if (clue1.number == cluenum) {
+                        clue1.message = clue
+                        clue1.answers = answers
+                    }
+                }
+            } else {
+                manager.clues.add(Clue(cluenum, clue, answers))
+            }
         }
-        manager.clues.reverse()
+        if (!reAdd) {
+            manager.clues.sortBy { it.number }
+        }
     }
 }

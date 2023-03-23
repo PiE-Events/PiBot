@@ -1,14 +1,8 @@
 package com.loudbook.dev
 
 import com.loudbook.dev.scavangerhunt.*
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.redisson.Redisson
-import org.redisson.api.RTopic
 import org.redisson.config.Config
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import org.slf4j.spi.SLF4JServiceProvider
 import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
@@ -18,7 +12,7 @@ class Main {
     companion object {
         private var token: String? = null
         private var uri: String? = null
-        private var discord: Discord? = null
+
         @JvmStatic
         fun main(args: Array<String>) = runBlocking {
             System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "Warn");
@@ -85,6 +79,7 @@ class Main {
                     team.voiceChannel.delete().complete()
                 }
                 discord.jda.shutdown()
+                println("Done here. Bye.")
             })
         }
     }

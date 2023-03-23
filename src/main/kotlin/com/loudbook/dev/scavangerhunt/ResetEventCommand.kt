@@ -18,5 +18,9 @@ class ResetEventCommand(private val teamManager: TeamManager,
             clueParser.run()
             event.hook.sendMessage("Event has been reset!").queue()
         }
+        if (event.interaction.name == "reparse") {
+            clueParser.run()
+            event.hook.sendMessage("Clues have been parsed!").queue()
+        }
     }
 }

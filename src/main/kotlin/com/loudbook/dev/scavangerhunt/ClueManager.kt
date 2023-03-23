@@ -1,15 +1,12 @@
 package com.loudbook.dev.scavangerhunt
 
 import com.loudbook.dev.Discord
-import kotlinx.coroutines.flow.combineTransform
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
 import java.awt.Color
-import java.lang.NullPointerException
 import java.util.concurrent.TimeUnit
-import kotlin.math.log
 
 class ClueManager(jda: JDA, val teamManager: TeamManager) {
     val clues: MutableList<Clue> = ArrayList()
@@ -64,13 +61,17 @@ class ClueManager(jda: JDA, val teamManager: TeamManager) {
 
         answer = answer.replace("[", "").replace("]", "")
 
+        val ebLog = EmbedBuilder()
+        ebLog.setDescription("**#${clue.number}:** [${team.name}] ${interaction.user.asMention} - $answer")
+        ebLog.setColor(Color.GRAY)
+        answerLogChannel.sendMessageEmbeds(ebLog.build()).queue()
+
         if (clue.isAnswer(answer)) {
             interaction.hook.sendMessage(possibleAnswers.random()).queue()
             val nextClue = getClueByNumber(clue.number + 1)
             if (nextClue == null) {
                 currentWinners++
                 interaction.hook.sendMessage(":tada: You have completed the scavenger hunt! You are team **#$currentWinners** to finish. :tada:").queue()
-                answerLogChannel.sendMessage(":tada: Team **${team.name}** has completed the scavenger hunt in place **#$currentWinners**.").queue()
                 if (currentWinners <=3) {
                     val eb = EmbedBuilder()
                     val place: String = when (currentWinners) {
@@ -122,10 +123,6 @@ class ClueManager(jda: JDA, val teamManager: TeamManager) {
             interaction.channel.sendMessage(nextClue.message).queueAfter(2000, TimeUnit.MILLISECONDS)
         } else {
             interaction.hook.sendMessage(possibleNopes.random()).queue()
-            val eb = EmbedBuilder()
-            eb.setDescription("${interaction.user.asMention} on team **${team.name}** guessed **$answer** for **Clue ${clue.number}**")
-            eb.setColor(Color.GRAY)
-            answerLogChannel.sendMessageEmbeds(eb.build()).queue()
         }
     }
 }
