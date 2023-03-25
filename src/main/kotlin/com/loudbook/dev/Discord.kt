@@ -21,7 +21,7 @@ class Discord {
             .enableIntents(GatewayIntent.MESSAGE_CONTENT)
             .setEnableShutdownHook(false)
             .build().awaitReady()
-/*        jda!!.updateCommands().addCommands(
+        jda!!.updateCommands().addCommands(
             Commands.slash("teamcreate", "Create a team")
                 .addOptions(OptionData(OptionType.STRING, "name", "The name of the team").setRequired(true))
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_CHANNEL, Permission.MODERATE_MEMBERS)),
@@ -41,7 +41,7 @@ class Discord {
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_CHANNEL, Permission.MODERATE_MEMBERS)),
             Commands.slash("allteamlist", "List all the teams")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.MANAGE_CHANNEL, Permission.MODERATE_MEMBERS)),
-            ).queue()*/
+            ).queue()
     }
     fun sendMCEmbed(sender: String, message: String) {
         val embedBuilder = EmbedBuilder()

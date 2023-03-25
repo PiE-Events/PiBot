@@ -38,6 +38,10 @@ class TeamCommand(private val teamManager: TeamManager) : ListenerAdapter() {
                 event.interaction.reply("That user is already in a team!").queue()
                 return
             }
+            if (teamManager.getTeam(event.interaction.options[0].asUser)!!.members.size >= 3) {
+                event.interaction.reply("That team is full!").queue()
+                return
+            }
             event.reply("${event.interaction.options[0].asUser.asMention} you have been invited to join **${teamManager.getTeam(event.interaction.user)!!.name}**!")
                 .addActionRow(Button.success("accept", "Accept"))
                 .queue()
@@ -83,6 +87,10 @@ class TeamCommand(private val teamManager: TeamManager) : ListenerAdapter() {
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
         if (!map.containsKey(event.user)) {
             event.interaction.reply("That's no longer valid!").queue()
+            return
+        }
+        if (map[event.interaction.user]!!.members.size >= 3) {
+            event.interaction.reply("That team is full!").queue()
             return
         }
         map[event.interaction.user]!!.addMember(event.interaction.user)
