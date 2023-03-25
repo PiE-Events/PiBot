@@ -1,24 +1,26 @@
 package com.loudbook.dev.scavangerhunt
 
 import com.loudbook.dev.Discord
-import kotlinx.coroutines.flow.combineTransform
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
-import kotlin.math.log
+import java.awt.Color
+import java.util.concurrent.TimeUnit
 
-class ClueManager {
+class ClueManager(jda: JDA, val teamManager: TeamManager) {
     val clues: MutableList<Clue> = ArrayList()
-    private val jda = Discord.jda
     val activeClues: MutableMap<TextChannel, Clue> = HashMap()
+    var started: Boolean = false
     private val possibleAnswers: List<String> = listOf("You got it!", "Good job!", "Amazing!", "Correct!")
     private val possibleNopes: List<String> = listOf("Nope!", "That's not it...", "Luke disapproves.", "Nuh-uh.")
     private var currentWinners = 0
-    private val logChannel = jda!!.getGuildById(Discord.guildID)!!.getTextChannelById(903825273965903882)
-    private val answerLogChannel = jda!!.getGuildById(Discord.guildID)!!.getTextChannelById(904182216932855808)
-    private val progressLogChannel = jda!!.getGuildById(Discord.guildID)!!.getTextChannelById(906608119558336512)
+    private val guild = jda.getGuildById(Discord.guildID)?: throw NullPointerException("Guild is null!")
+    private val logChannel = guild.getTextChannelById(903825273965903882)
+    private val answerLogChannel = guild.getTextChannelById(904182216932855808)
+    private val progressLogChannel = guild.getTextChannelById(906608119558336512)
 
-    fun getClueByNumber(number: Int): Clue? {
+    private fun getClueByNumber(number: Int): Clue? {
         for (clue in clues) {
             if (clue.number == number) {
                 return clue
@@ -27,7 +29,7 @@ class ClueManager {
         return null
     }
 
-    fun getClueByChannel(textChannel: TextChannel): Clue? {
+    private fun getClueByChannel(textChannel: TextChannel): Clue? {
         for (activeClue in activeClues) {
             if (activeClue.key != textChannel) continue
             return activeClue.value
@@ -36,46 +38,91 @@ class ClueManager {
     }
 
     fun answerEvent(interaction: SlashCommandInteraction) {
+        logChannel ?: throw NullPointerException("Log channel is null!")
+        answerLogChannel ?: throw NullPointerException("Answer log channel is null!")
+        progressLogChannel ?: throw NullPointerException("Progress log channel is null!")
+
         val channel = interaction.channel as TextChannel
         val clue = getClueByChannel(channel)
+
         if (clue == null) {
-            interaction.reply("There is no active clue in this channel!").queue()
+            interaction.hook.sendMessage("There is no active clue in this channel!").queue()
             return
         }
 
         var answer = interaction.getOption("answer")?.asString
 
         if (answer == null) {
-            interaction.reply("You must provide an answer!").queue()
+            interaction.hook.sendMessage("You must provide an answer!").queue()
             return
         }
 
+        val team = teamManager.getTeam(channel)?: throw NullPointerException("Team is null!")
+
         answer = answer.replace("[", "").replace("]", "")
 
+        val ebLog = EmbedBuilder()
+        ebLog.setDescription("**#${clue.number}:** [${team.name}] ${interaction.user.asMention} - $answer")
+        ebLog.setColor(Color.GRAY)
+        answerLogChannel.sendMessageEmbeds(ebLog.build()).queue()
+
         if (clue.isAnswer(answer)) {
-            interaction.reply(possibleAnswers.random()).queue()
+            interaction.hook.sendMessage(possibleAnswers.random()).queue()
             val nextClue = getClueByNumber(clue.number + 1)
             if (nextClue == null) {
-                interaction.reply(":tada: You have completed the scavenger hunt! You are team **#$currentWinners** to finish. :tada:").queue()
-                answerLogChannel!!.sendMessage(":tada: Team **${channel.name}** has completed the scavenger hunt in place **#$currentWinners**").queue()
-                interaction.channel.delete().queue()
                 currentWinners++
+                interaction.hook.sendMessage(":tada: You have completed the scavenger hunt! You are team **#$currentWinners** to finish. :tada:").queue()
+                if (currentWinners <=3) {
+                    val eb = EmbedBuilder()
+                    val place: String = when (currentWinners) {
+                        1 -> {
+                            "First"
+                        }
+                        2 -> {
+                            "Second"
+                        }
+                        else -> {
+                            "Third"
+                        }
+                    }
+                    val color: Color = when (currentWinners) {
+                        1 -> {
+                            Color(255, 215, 0)
+                        }
+                        2 -> {
+                            Color(192,192,192)
+                        }
+                        else -> {
+                            Color(205, 127, 50)
+                        }
+                    }
+                    eb.setTitle(":partying_face: $place Place :partying_face:")
+                    eb.setDescription("Team **${team.name}** has completed the hunt!")
+                    eb.setFooter("PiBot Scavenger Hunt", "https://cdn.discordapp.com/attachments/985583793698140240/1068928440255926322/PiE_1.png")
+                    eb.setColor(color)
+                    progressLogChannel.sendMessageEmbeds(eb.build()).queue()
+                }
                 return
             }
 
             if (!clue.answered) {
-                progressLogChannel!!.sendMessage(":tada: Team **${channel.name}** has completed **Clue ${clue.number}** first! :tada:").queue()
+                val eb = EmbedBuilder()
+                eb.setTitle("Clue ${clue.number} Completed! :tada:")
+                eb.setDescription("Team **${team.name}** has completed clue **${clue.number}** first!")
+                eb.setFooter("PiBot Scavenger Hunt", "https://cdn.discordapp.com/attachments/985583793698140240/1068928440255926322/PiE_1.png")
+                eb.setColor(Color.GREEN)
+                progressLogChannel.sendMessageEmbeds(eb.build()).queue()
                 clue.answered = true
-            } else {
-                progressLogChannel!!.sendMessage(":white_check_mark: Team ${channel.name} has completed clue ${clue.number}.").queue()
             }
 
-            logChannel!!.sendMessage("Team ${channel.name} has completed clue ${clue.number}.").queue()
+            val eb = EmbedBuilder()
+            eb.setDescription("Team **${team.name}** has completed clue ${clue.number}.")
+            eb.setColor(Color.GREEN)
+            logChannel.sendMessageEmbeds(eb.build()).queue()
             activeClues[channel] = nextClue
-            interaction.channel.sendMessage(nextClue.message).queue()
+            interaction.channel.sendMessage(nextClue.message).queueAfter(2000, TimeUnit.MILLISECONDS)
         } else {
-            interaction.reply(possibleNopes.random()).queue()
-            logChannel!!.sendMessage(":x: Team **${channel.name}** guessed **$answer** for **Clue ${clue.number}**").queue()
+            interaction.hook.sendMessage(possibleNopes.random()).queue()
         }
     }
 }

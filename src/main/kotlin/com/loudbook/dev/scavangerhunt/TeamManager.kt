@@ -1,6 +1,7 @@
 package com.loudbook.dev.scavangerhunt
 
 import com.loudbook.dev.Discord
+import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.ChannelType
@@ -9,12 +10,11 @@ import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
 import okhttp3.internal.wait
 import java.util.*
 
-class TeamManager {
+class TeamManager(val jda: JDA) {
     val teams = mutableListOf<Team>()
-    val jda = Discord.jda
 
     fun addTeam(teamName: String, leader: User) {
-        val guild = jda!!.getGuildById(Discord.guildID)
+        val guild = jda.getGuildById(Discord.guildID)
         try {
             jda.getGuildById(guild!!.id)!!.createVoiceChannel(teamName)
                 .addRolePermissionOverride(guild.publicRole.idLong, null, EnumSet.of(Permission.VIEW_CHANNEL))
@@ -34,7 +34,8 @@ class TeamManager {
         val team = Team(voice,
             text,
             teamName,
-            leader)
+            leader,
+            jda)
 
         team.addMember(leader)
         this.teams.add(team)
@@ -42,7 +43,7 @@ class TeamManager {
 
     fun getTeam(voiceChannel: VoiceChannel): Team? {
         for (team in teams) {
-            if (team.voiceChannel == voiceChannel) {
+            if (team.voiceChannel == voiceChannel && team.textChannel.parentCategory!!.id == "1072558723895140362") {
                 return team
             }
         }
@@ -51,7 +52,7 @@ class TeamManager {
 
     fun getTeam(textChannel: TextChannel): Team? {
         for (team in teams) {
-            if (team.textChannel == textChannel) {
+            if (team.textChannel == textChannel && team.textChannel.parentCategory!!.id == "1072558723895140362") {
                 return team
             }
         }

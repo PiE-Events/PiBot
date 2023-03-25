@@ -8,16 +8,19 @@ class ResetEventCommand(private val teamManager: TeamManager,
                         private val clueParser: ClueParser) : ListenerAdapter() {
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if (event.interaction.name == "reset") {
-            teamManager.teams.forEach { it ->
-                it.members.forEach {
-                    teamManager.getTeam(it)!!.removeMember(it)
-                }
+            teamManager.teams.clear()
+            clueManager.clues.clear()
+            for (team in teamManager.teams) {
+                team.textChannel.delete().complete()
+                team.voiceChannel.delete().complete()
             }
-            clueManager.clues.forEach {
-                clueManager.clues.remove(it)
-            }
+            clueManager.started = false
             clueParser.run()
-            event.interaction.reply("Event has been reset!").queue()
+            event.hook.sendMessage("Event has been reset!").queue()
+        }
+        if (event.interaction.name == "reparse") {
+            clueParser.run()
+            event.hook.sendMessage("Clues have been parsed!").queue()
         }
     }
 }
