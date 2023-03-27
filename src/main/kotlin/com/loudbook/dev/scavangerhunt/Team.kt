@@ -2,7 +2,6 @@ package com.loudbook.dev.scavangerhunt
 
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
-import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel

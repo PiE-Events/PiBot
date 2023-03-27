@@ -2,7 +2,6 @@ package com.loudbook.dev
 
 import com.loudbook.dev.scavangerhunt.*
 import kotlinx.coroutines.runBlocking
-import org.redisson.config.Config
 import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
@@ -15,7 +14,7 @@ class Main {
 
         @JvmStatic
         fun main(args: Array<String>) = runBlocking {
-            System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "Warn");
+            System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "Warn")
             try {
                 FileInputStream("./config.properties").use { input ->
                     val prop = Properties()
@@ -28,7 +27,7 @@ class Main {
                 ex.printStackTrace()
             }
 
-            val config = Config()
+//            val config = Config()
 /*            config.useSingleServer()
                 .address = uri*/
 //            val redisson = Redisson.create(config)

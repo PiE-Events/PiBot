@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.utils.MemberCachePolicy
 import java.awt.Color
 
+@Suppress("unused")
 class Discord {
     lateinit var jda: JDA
     companion object {

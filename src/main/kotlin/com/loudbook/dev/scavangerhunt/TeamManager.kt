@@ -4,11 +4,10 @@ import com.loudbook.dev.Discord
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.User
-import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
-import okhttp3.internal.wait
 import java.util.*
+@Suppress("unused")
 
 class TeamManager(val jda: JDA) {
     val teams = mutableListOf<Team>()
@@ -28,8 +27,13 @@ class TeamManager(val jda: JDA) {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        var voice: VoiceChannel = jda.getVoiceChannelsByName(teamName, true)[0]
-        var text: TextChannel = jda.getTextChannelsByName(teamName.replace(" ", "-"), true)[0]
+        val voice: VoiceChannel = jda.getVoiceChannelsByName(teamName, true).filter {
+            it.parentCategory != null && it.parentCategory!!.id == "1072558723895140362"
+        }[0]
+
+        val text: TextChannel = jda.getTextChannelsByName(teamName.replace(" ", "-"), true).filter {
+            it.parentCategory != null && it.parentCategory!!.id == "1072558723895140362"
+        }[0]
 
         val team = Team(voice,
             text,
@@ -52,7 +56,7 @@ class TeamManager(val jda: JDA) {
 
     fun getTeam(textChannel: TextChannel): Team? {
         for (team in teams) {
-            if (team.textChannel == textChannel && team.textChannel.parentCategory!!.id == "1072558723895140362") {
+            if (team.textChannel == textChannel) {
                 return team
             }
         }
