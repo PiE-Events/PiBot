@@ -5,11 +5,13 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
+import java.io.Serializable
 import java.util.*
 import kotlin.collections.ArrayList
 
 class Team(val voiceChannel: VoiceChannel, val textChannel: TextChannel, val name: String, val leader: User, val jda: JDA) {
     val members: MutableList<User> = ArrayList()
+    var clueNumber = 0
     fun addMember(user: User) {
         this.members.add(user)
         voiceChannel.manager.putMemberPermissionOverride(
@@ -51,5 +53,9 @@ class Team(val voiceChannel: VoiceChannel, val textChannel: TextChannel, val nam
         if (this.voiceChannel.members.contains(member)) {
             jda.getGuildById(903380581117751406)!!.kickVoiceMember(member).queue()
         }
+    }
+
+    fun serialize(): SerializedTeam {
+        return SerializedTeam(voiceChannel.idLong, textChannel.idLong, name, leader.idLong)
     }
 }

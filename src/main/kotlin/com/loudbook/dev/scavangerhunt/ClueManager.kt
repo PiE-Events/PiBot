@@ -8,9 +8,8 @@ import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
 import java.awt.Color
 import java.util.concurrent.TimeUnit
 
-class ClueManager(jda: JDA, val teamManager: TeamManager) {
+class ClueManager(jda: JDA, private val teamManager: TeamManager) {
     val clues: MutableList<Clue> = ArrayList()
-    val activeClues: MutableMap<TextChannel, Clue> = HashMap()
     var started: Boolean = false
     private val possibleAnswers: List<String> = listOf("You got it!", "Good job!", "Amazing!", "Correct!")
     private val possibleNopes: List<String> = listOf("Nope!", "That's not it...", "Luke disapproves.", "Nuh-uh.")
@@ -30,9 +29,9 @@ class ClueManager(jda: JDA, val teamManager: TeamManager) {
     }
 
     private fun getClueByChannel(textChannel: TextChannel): Clue? {
-        for (activeClue in activeClues) {
-            if (activeClue.key != textChannel) continue
-            return activeClue.value
+        for (team in teamManager.teams) {
+            if (team.textChannel != textChannel) continue
+            return clues.filter { it.number == team.clueNumber }[0]
         }
         return null
     }
@@ -119,7 +118,7 @@ class ClueManager(jda: JDA, val teamManager: TeamManager) {
             eb.setDescription("Team **${team.name}** has completed clue ${clue.number}.")
             eb.setColor(Color.GREEN)
             logChannel.sendMessageEmbeds(eb.build()).queue()
-            activeClues[channel] = nextClue
+            teamManager.getTeam(channel)?.clueNumber = clue.number + 1
             interaction.channel.sendMessage(nextClue.message).queueAfter(2000, TimeUnit.MILLISECONDS)
         } else {
             interaction.hook.sendMessage(possibleNopes.random()).queue()

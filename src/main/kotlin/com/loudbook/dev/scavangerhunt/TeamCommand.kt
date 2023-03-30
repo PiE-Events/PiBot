@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 
-class TeamCommand(private val teamManager: TeamManager, private val clueManager: ClueManager) : ListenerAdapter() {
+class TeamCommand(private val teamManager: TeamManager, private val clueManager: ClueManager, private val fileManager: FileManager) : ListenerAdapter() {
     private val map = mutableMapOf<User, Team>()
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
@@ -33,6 +33,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
             }
             teamManager.addTeam(event.interaction.options[0].asString, event.interaction.user)
             event.hook.sendMessage(":tada: Team **${event.interaction.options[0].asString}** has been created!").queue()
+            fileManager.save()
         }
         if (event.interaction.name == "invite") {
             if (clueManager.started) {
@@ -78,6 +79,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
                 event.hook.sendMessage("You have left **${teamManager.getTeam(event.interaction.user)!!.name}**!").queue()
                 teamManager.getTeam(event.interaction.user)!!.removeMember(event.interaction.user)
             }
+            fileManager.save()
         }
         if (event.interaction.name == "teamlist") {
             if (teamManager.getTeam(event.interaction.user) == null) {
@@ -109,5 +111,6 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
         map[event.interaction.user]!!.addMember(event.interaction.user)
         event.reply("${ map[event.interaction.user]!!.leader.asMention}, ${event.user.name} has joined **${map[event.interaction.user]!!.name}**!").queue()
         map.remove(event.interaction.user)
+        fileManager.save()
     }
 }

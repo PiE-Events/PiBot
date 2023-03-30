@@ -3,6 +3,11 @@ package com.loudbook.dev
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
+import net.dv8tion.jda.api.interactions.commands.OptionType
+import net.dv8tion.jda.api.interactions.commands.build.Commands
+import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.utils.MemberCachePolicy
 import java.awt.Color
@@ -20,6 +25,7 @@ class Discord {
             .enableIntents(GatewayIntent.GUILD_MEMBERS)
             .setMemberCachePolicy(MemberCachePolicy.ALL)
             .build().awaitReady()
+//        jda.updateCommands().queue()
 /*        jda.getGuildById(guildID)!!.updateCommands().addCommands(
             Commands.slash("teamcreate", "Create a team.")
                 .addOptions(OptionData(OptionType.STRING, "name", "The name of the team.").setRequired(true))

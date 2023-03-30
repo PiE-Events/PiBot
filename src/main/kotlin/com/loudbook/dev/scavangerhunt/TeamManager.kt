@@ -10,28 +10,28 @@ import java.util.*
 @Suppress("unused")
 
 class TeamManager(val jda: JDA) {
-    val teams = mutableListOf<Team>()
+    var teams = mutableListOf<Team>()
 
     fun addTeam(teamName: String, leader: User) {
-        val guild = jda.getGuildById(Discord.guildID)
+        val guild = this.jda.getGuildById(Discord.guildID)
         try {
-            jda.getGuildById(guild!!.id)!!.createVoiceChannel(teamName)
+            this.jda.getGuildById(guild!!.id)!!.createVoiceChannel(teamName)
                 .addRolePermissionOverride(guild.publicRole.idLong, null, EnumSet.of(Permission.VIEW_CHANNEL))
                 .setParent(guild.getCategoryById(1072558723895140362))
                 .complete()
 
-            jda.getGuildById(guild.id)!!.createTextChannel(teamName)
+            this.jda.getGuildById(guild.id)!!.createTextChannel(teamName)
                 .addRolePermissionOverride(guild.publicRole.idLong, null, EnumSet.of(Permission.VIEW_CHANNEL))
                 .setParent(guild.getCategoryById(1072558723895140362))
                 .complete()
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        val voice: VoiceChannel = jda.getVoiceChannelsByName(teamName, true).filter {
+        val voice: VoiceChannel = this.jda.getVoiceChannelsByName(teamName, true).filter {
             it.parentCategory != null && it.parentCategory!!.id == "1072558723895140362"
         }[0]
 
-        val text: TextChannel = jda.getTextChannelsByName(teamName.replace(" ", "-"), true).filter {
+        val text: TextChannel = this.jda.getTextChannelsByName(teamName.replace(" ", "-"), true).filter {
             it.parentCategory != null && it.parentCategory!!.id == "1072558723895140362"
         }[0]
 
@@ -39,7 +39,7 @@ class TeamManager(val jda: JDA) {
             text,
             teamName,
             leader,
-            jda)
+            this.jda)
 
         team.addMember(leader)
         this.teams.add(team)

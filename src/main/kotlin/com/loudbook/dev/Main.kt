@@ -38,11 +38,13 @@ class Main {
             val teamManager = TeamManager(discord.jda)
             val clueManager = ClueManager(discord.jda, teamManager)
             val clueParser = ClueParser(clueManager, discord.jda)
+            val fileManager = FileManager(teamManager, discord.jda)
             clueParser.run()
+            fileManager.load()
             discord.jda.addEventListener(AnswerCommand(clueManager))
             discord.jda.addEventListener(StartEvertCommand(teamManager, clueManager))
             discord.jda.addEventListener(ResetEventCommand(teamManager, clueManager, clueParser))
-            discord.jda.addEventListener(TeamCommand(teamManager, clueManager))
+            discord.jda.addEventListener(TeamCommand(teamManager, clueManager, fileManager))
 /*            launch {
                 val topic: RTopic = redisson.getTopic("mcmessage")
                 topic.addListener(
@@ -73,10 +75,6 @@ class Main {
             println("PiBot is running!")
 
             Runtime.getRuntime().addShutdownHook(Thread {
-                for (team in teamManager.teams) {
-                    team.textChannel.delete().complete()
-                    team.voiceChannel.delete().complete()
-                }
                 discord.jda.shutdown()
                 println("Done here. Bye.")
             })
