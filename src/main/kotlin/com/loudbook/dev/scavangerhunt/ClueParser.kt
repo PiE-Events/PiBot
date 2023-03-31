@@ -13,11 +13,30 @@ class ClueParser(private val manager: ClueManager, jda: JDA) {
         val messages: List<Message> = history.retrievedHistory
         for (message in messages) {
             val str = message.contentDisplay
-            val cluenum: Int =
-                Integer.valueOf(str.substring(str.indexOf("[") + 1,
-                    str.indexOf("]")).replace("Clue ", ""))
-            val answers: MutableList<String> = ArrayList(
-                str.split("[Answer]")[1].split("|"))
+
+            val cluenum: Int
+            try {
+                cluenum =
+                    Integer.valueOf(
+                        str.substring(
+                            str.indexOf("[") + 1,
+                            str.indexOf("]")
+                        ).replace("Clue ", "")
+                    )
+            } catch (e: Exception) {
+                println("Error parsing clue!")
+                continue
+            }
+
+            val answers: MutableList<String>
+            try {
+                answers = ArrayList(
+                    str.split("[Answer]")[1].split("|")
+                )
+            } catch (e: Exception) {
+                println("Error parsing answers!")
+                continue
+            }
             for ((i, answer) in answers.withIndex()) {
                 answers[i] = answer.trim()
             }
