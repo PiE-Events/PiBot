@@ -97,7 +97,7 @@ class ClueManager(jda: JDA, private val teamManager: TeamManager) {
                     }
                     eb.setTitle(":partying_face: $place Place :partying_face:")
                     eb.setDescription("Team **${team.name}** has completed the hunt!")
-                    eb.setFooter("PiBot Scavenger Hunt", "https://cdn.discordapp.com/attachments/985583793698140240/1068928440255926322/PiE_1.png")
+                    eb.setFooter("PiEvents Scavenger Hunt", "https://cdn.discordapp.com/attachments/985583793698140240/1068928440255926322/PiE_1.png")
                     eb.setColor(color)
                     progressLogChannel.sendMessageEmbeds(eb.build()).queue()
                 }
@@ -108,7 +108,7 @@ class ClueManager(jda: JDA, private val teamManager: TeamManager) {
                 val eb = EmbedBuilder()
                 eb.setTitle("Clue ${clue.number} Completed! :tada:")
                 eb.setDescription("Team **${team.name}** has completed clue **${clue.number}** first!")
-                eb.setFooter("PiBot Scavenger Hunt", "https://cdn.discordapp.com/attachments/985583793698140240/1068928440255926322/PiE_1.png")
+                eb.setFooter("PiEvents Scavenger Hunt", "https://cdn.discordapp.com/attachments/985583793698140240/1068928440255926322/PiE_1.png")
                 eb.setColor(Color.GREEN)
                 progressLogChannel.sendMessageEmbeds(eb.build()).queue()
                 clue.answered = true

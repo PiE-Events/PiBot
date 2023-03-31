@@ -45,6 +45,7 @@ class Main {
             discord.jda.addEventListener(StartEvertCommand(teamManager, clueManager))
             discord.jda.addEventListener(ResetEventCommand(teamManager, clueManager, clueParser))
             discord.jda.addEventListener(TeamCommand(teamManager, clueManager, fileManager))
+            discord.jda.addEventListener(DebugCommand())
 /*            launch {
                 val topic: RTopic = redisson.getTopic("mcmessage")
                 topic.addListener(

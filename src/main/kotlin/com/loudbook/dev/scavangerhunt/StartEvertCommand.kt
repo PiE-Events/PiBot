@@ -12,7 +12,7 @@ class StartEvertCommand(private val teamManager: TeamManager, private val clueMa
                         "You will be competing against **${teamManager.teams.size-1}** other teams. " +
                         team.members.joinToString(", ") { it.asMention }).queue()
                 team.textChannel.sendMessage(clueManager.clues[0].message).queueAfter(30000, TimeUnit.MILLISECONDS)
-                team.clueNumber = 0
+                team.clueNumber = 1
             }
             clueManager.started = true
             event.hook.sendMessage("Event has started!").queue()

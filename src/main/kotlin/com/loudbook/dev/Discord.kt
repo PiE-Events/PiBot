@@ -48,6 +48,8 @@ class Discord {
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.PRIORITY_SPEAKER)),
             Commands.slash("reparse", "Reparse the clues.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)),
+            Commands.slash("debug", "Debug command.")
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)),
             ).queue()*/
 
     }
