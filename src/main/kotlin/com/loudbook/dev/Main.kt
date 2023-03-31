@@ -74,7 +74,6 @@ class Main {
                 topic.publish("test")
             }*/
             println("PiBot is running!")
-
             Runtime.getRuntime().addShutdownHook(Thread {
                 discord.jda.shutdown()
                 println("Done here. Bye.")

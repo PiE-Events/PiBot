@@ -23,6 +23,7 @@ dependencies {
 }
 shadowJar {
     minimize()
+    archiveFileName.set("PiBot-1.0.jar")
 }
 test {
     useJUnitPlatform()
