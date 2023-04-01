@@ -5,8 +5,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.components.buttons.Button
+import org.redisson.api.RedissonClient
 
-class TeamCommand(private val teamManager: TeamManager, private val clueManager: ClueManager, private val fileManager: FileManager) : ListenerAdapter() {
+class TeamCommand(private val teamManager: TeamManager, private val clueManager: ClueManager, private val fileManager: FileManager, private val redissonClient: RedissonClient) : ListenerAdapter() {
     private val map = mutableMapOf<User, Team>()
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
@@ -92,6 +93,12 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
         if (event.interaction.name == "allteamlist") {
             event.hook.sendMessage("All teams:\n • " +
                     teamManager.teams.joinToString("\n • ") { it.name }).queue()
+        }
+        if (event.interaction.name == "pushteams") {
+            for (team in teamManager.teams) {
+                redissonClient.getTopic("mchunt").publish("ID:${team.id},${team.name}")
+            }
+            event.hook.sendMessage("Pushed teams to Redis!").queue()
         }
     }
 
