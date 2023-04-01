@@ -41,7 +41,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
                 return
             }
             if (teamManager.getTeam(event.interaction.user) == null) {
-                event.interaction.reply("You are not in a team!").queue()
+                event.hook.sendMessage("You are not in a team!").queue()
                 return
             }
             if (teamManager.getTeam(event.interaction.user)!!.leader != event.interaction.user) {
@@ -52,7 +52,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
                 event.hook.sendMessage("That user is already in a team!").queue()
                 return
             }
-            event.reply("${event.interaction.options[0].asUser.asMention} you have been invited to join **${teamManager.getTeam(event.interaction.user)!!.name}**!")
+            event.hook.sendMessage("${event.interaction.options[0].asUser.asMention} you have been invited to join **${teamManager.getTeam(event.interaction.user)!!.name}**!")
                 .addActionRow(Button.success("accept", "Accept"))
                 .queue()
             map[event.interaction.options[0].asUser] = teamManager.getTeam(event.interaction.user)!!

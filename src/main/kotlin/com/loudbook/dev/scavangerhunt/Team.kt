@@ -5,13 +5,18 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
-import java.io.Serializable
+import org.redisson.api.RedissonClient
 import java.util.*
-import kotlin.collections.ArrayList
 
-class Team(val voiceChannel: VoiceChannel, val textChannel: TextChannel, val name: String, val leader: User, val jda: JDA) {
+class Team(val voiceChannel: VoiceChannel, val textChannel: TextChannel, val name: String, val leader: User, val jda: JDA, redisson: RedissonClient) {
     val members: MutableList<User> = ArrayList()
     var clueNumber = 0
+    private val charPool : List<Char> = ('A'..'Z') + ('0'..'9')
+    val id = List(5) { charPool.random() }.joinToString("")
+    init {
+        redisson.getTopic("mchunt").publish("ID:$id,$name")
+    }
+
     fun addMember(user: User) {
         this.members.add(user)
         voiceChannel.manager.putMemberPermissionOverride(

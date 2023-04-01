@@ -6,10 +6,11 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel
+import org.redisson.api.RedissonClient
 import java.util.*
 @Suppress("unused")
 
-class TeamManager(val jda: JDA) {
+class TeamManager(val jda: JDA, val redisson: RedissonClient) {
     var teams = mutableListOf<Team>()
 
     fun addTeam(teamName: String, leader: User) {
@@ -39,7 +40,8 @@ class TeamManager(val jda: JDA) {
             text,
             teamName,
             leader,
-            this.jda)
+            this.jda,
+            this.redisson)
 
         team.addMember(leader)
         this.teams.add(team)
@@ -66,6 +68,15 @@ class TeamManager(val jda: JDA) {
     fun getTeam(user: User): Team? {
         for (team in teams) {
             if (team.members.contains(user)) {
+                return team
+            }
+        }
+        return null
+    }
+
+    fun getTeam(id: String): Team? {
+        for (team in teams) {
+            if (team.id == id) {
                 return team
             }
         }

@@ -9,10 +9,11 @@ class StartEvertCommand(private val teamManager: TeamManager, private val clueMa
         if (event.interaction.name == "start") {
             for (team in teamManager.teams) {
                 team.textChannel.sendMessage("Get ready! The hunt will start in **30** seconds. " +
-                        "You will be competing against **${teamManager.teams.size-1}** other teams. " +
+                        "You will be competing against **${teamManager.teams.size-1}** other teams. Your team code is `${team.id}`. " +
                         team.members.joinToString(", ") { it.asMention }).queue()
                 team.textChannel.sendMessage(clueManager.clues[0].message).queueAfter(30000, TimeUnit.MILLISECONDS)
                 team.clueNumber = 1
+                teamManager.redisson.getTopic("mchunt").publish("ID:${team.id},${team.name}")
             }
             clueManager.started = true
             event.hook.sendMessage("Event has started!").queue()

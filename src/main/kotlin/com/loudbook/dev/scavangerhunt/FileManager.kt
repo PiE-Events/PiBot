@@ -1,9 +1,10 @@
 package com.loudbook.dev.scavangerhunt
 
 import net.dv8tion.jda.api.JDA
+import org.redisson.api.RedissonClient
 import java.io.*
 
-class FileManager(private val teamManager: TeamManager, private val jda: JDA) {
+class FileManager(private val teamManager: TeamManager, private val jda: JDA, private val redissonClient: RedissonClient) {
     fun save() {
         val file = File("./teams.db")
         if (!file.exists()) {
@@ -38,7 +39,8 @@ class FileManager(private val teamManager: TeamManager, private val jda: JDA) {
                     jda.getTextChannelById(serializedTeam.textChannel)?: continue,
                     serializedTeam.name,
                     leader,
-                    jda
+                    jda,
+                    redissonClient
                 )
             )
             println("Loaded team ${serializedTeam.name}")
