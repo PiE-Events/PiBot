@@ -45,7 +45,7 @@ class Main {
             discord.connect(token!!)
 
             val teamManager = TeamManager(discord.jda, redisson)
-            val clueManager = ClueManager(discord.jda, teamManager)
+            val clueManager = ClueManager(discord.jda, teamManager, redisson)
             val clueParser = ClueParser(clueManager, discord.jda)
             val fileManager = FileManager(teamManager, discord.jda, redisson)
             clueParser.run()

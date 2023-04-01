@@ -3,6 +3,7 @@ package com.loudbook.dev.scavangerhunt
 class Clue(
     val number: Int,
     var message: String,
+    var minecraft: Boolean,
     var answers: List<String>) {
 
     var answered = false

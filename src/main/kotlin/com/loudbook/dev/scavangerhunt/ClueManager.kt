@@ -5,10 +5,11 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction
+import org.redisson.api.RedissonClient
 import java.awt.Color
 import java.util.concurrent.TimeUnit
 
-class ClueManager(jda: JDA, private val teamManager: TeamManager) {
+class ClueManager(jda: JDA, private val teamManager: TeamManager, private val redissonClient: RedissonClient) {
     val clues: MutableList<Clue> = ArrayList()
     var started: Boolean = false
     private val possibleAnswers: List<String> = listOf("You got it!", "Good job!", "Amazing!", "Correct!")
@@ -71,8 +72,11 @@ class ClueManager(jda: JDA, private val teamManager: TeamManager) {
         }
     }
 
-    fun executeAnswer(team: Team, clue: Clue) {
+    fun executeAnswer(team: Team, clue: Clue, mention: Boolean = false) {
         val nextClue = getClueByNumber(clue.number + 1)
+        if (mention) {
+            team.textChannel.sendMessage(team.members.joinToString(", ") { it.asMention }).queue()
+        }
         if (nextClue == null) {
             currentWinners++
             team.textChannel.sendMessage(":tada: You have completed the scavenger hunt! You are team **#$currentWinners** to finish. :tada:").queue()
@@ -108,6 +112,9 @@ class ClueManager(jda: JDA, private val teamManager: TeamManager) {
             }
             return
         }
+
+        if (nextClue.minecraft) redissonClient.getTopic("mchunt").publish("CLUE:${team.id},true")
+        else redissonClient.getTopic("mchunt").publish("CLUE:${team.id},false")
 
         if (!clue.answered) {
             val eb = EmbedBuilder()

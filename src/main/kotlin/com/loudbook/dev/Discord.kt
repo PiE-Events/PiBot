@@ -25,27 +25,21 @@ class Discord {
             .enableIntents(GatewayIntent.GUILD_MEMBERS)
             .setMemberCachePolicy(MemberCachePolicy.ALL)
             .build().awaitReady()
-//        jda.updateCommands().queue()
-/*        jda.getGuildById(guildID)!!.updateCommands().addCommands(
+/*//        jda.updateCommands().queue()
+        jda.getGuildById(guildID)!!.updateCommands().addCommands(
             Commands.slash("teamcreate", "Create a team.")
-                .addOptions(OptionData(OptionType.STRING, "name", "The name of the team.").setRequired(true))
-                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.PRIORITY_SPEAKER)),
-            Commands.slash("teamleave", "Leave your team.")
-                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.PRIORITY_SPEAKER)),
+                .addOptions(OptionData(OptionType.STRING, "name", "The name of the team.").setRequired(true)),
+            Commands.slash("teamleave", "Leave your team."),
             Commands.slash("invite", "Invite a user.")
-                .addOptions(OptionData(OptionType.USER, "user", "The user to invite.").setRequired(true))
-                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.PRIORITY_SPEAKER)),
+                .addOptions(OptionData(OptionType.USER, "user", "The user to invite.").setRequired(true)),
             Commands.slash("answer", "Answer a question.")
-                .addOptions(OptionData(OptionType.STRING, "answer", "The answer to the question.").setRequired(true))
-                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.PRIORITY_SPEAKER)),
+                .addOptions(OptionData(OptionType.STRING, "answer", "The answer to the question.").setRequired(true)),
             Commands.slash("start", "Start the game.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)),
             Commands.slash("reset", "Reset the game.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)),
-            Commands.slash("teamlist", "List the members in your team.")
-                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.PRIORITY_SPEAKER)),
-            Commands.slash("allteamlist", "List all the teams.")
-                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.PRIORITY_SPEAKER)),
+            Commands.slash("teamlist", "List the members in your team."),
+            Commands.slash("allteamlist", "List all the teams."),
             Commands.slash("reparse", "Reparse the clues.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)),
             Commands.slash("debug", "Debug command.")

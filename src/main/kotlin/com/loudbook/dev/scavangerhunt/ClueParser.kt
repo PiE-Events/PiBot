@@ -15,14 +15,30 @@ class ClueParser(private val manager: ClueManager, jda: JDA) {
             val str = message.contentDisplay
 
             val cluenum: Int
+            var minecraft = false
             try {
-                cluenum =
-                    Integer.valueOf(
-                        str.substring(
-                            str.indexOf("[") + 1,
-                            str.indexOf("]")
-                        ).replace("Clue ", "")
-                    )
+                if (str.substring(
+                        str.indexOf("[") + 1,
+                        str.indexOf("]")
+                    ).contains("MClue")) {
+                    cluenum =
+                        Integer.valueOf(
+                            str.substring(
+                                str.indexOf("[") + 1,
+                                str.indexOf("]")
+                            ).replace("MClue ", "")
+                        )
+                    println("Detected Minecraft clue! $cluenum")
+                    minecraft = true
+                } else {
+                    cluenum =
+                        Integer.valueOf(
+                            str.substring(
+                                str.indexOf("[") + 1,
+                                str.indexOf("]")
+                            ).replace("Clue ", "")
+                        )
+                }
             } catch (e: Exception) {
                 println("Error parsing clue!")
                 continue
@@ -42,15 +58,17 @@ class ClueParser(private val manager: ClueManager, jda: JDA) {
             var clue = message.contentRaw
             clue = clue.split("[Answer]")[0]
             clue = clue.replace("[Clue $cluenum]", "**Clue #$cluenum**", true)
+            clue = clue.replace("[MClue $cluenum]", "**Clue #$cluenum**", true)
             if (reAdd) {
                 for (clue1 in manager.clues) {
                     if (clue1.number == cluenum) {
                         clue1.message = clue
+                        clue1.minecraft = minecraft
                         clue1.answers = answers
                     }
                 }
             } else {
-                manager.clues.add(Clue(cluenum, clue, answers))
+                manager.clues.add(Clue(cluenum, clue, minecraft, answers))
             }
         }
         if (!reAdd) {

@@ -29,7 +29,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
                 return
             }
             if (event.interaction.options[0].asString.length > 16) {
-                event.hook.sendMessage("That name is long. Too long.").queue()
+                event.hook.sendMessage("That name is long. Too long. How about 16 characters max?").queue()
                 return
             }
             teamManager.addTeam(event.interaction.options[0].asString, event.interaction.user)

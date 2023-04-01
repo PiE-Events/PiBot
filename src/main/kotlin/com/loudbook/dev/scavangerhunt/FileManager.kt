@@ -33,16 +33,16 @@ class FileManager(private val teamManager: TeamManager, private val jda: JDA, pr
         val teams: MutableList<Team> = mutableListOf()
         for (serializedTeam in serializedTeams) {
             val leader = jda.retrieveUserById(serializedTeam.leader).complete()
-            teams.add(
-                Team(
-                    jda.getVoiceChannelById(serializedTeam.voiceChannel)?: continue,
-                    jda.getTextChannelById(serializedTeam.textChannel)?: continue,
-                    serializedTeam.name,
-                    leader,
-                    jda,
-                    redissonClient
-                )
+            val team = Team(
+                jda.getVoiceChannelById(serializedTeam.voiceChannel)?: continue,
+                jda.getTextChannelById(serializedTeam.textChannel)?: continue,
+                serializedTeam.name,
+                leader,
+                jda,
+                redissonClient,
             )
+            team.id = serializedTeam.id
+            teams.add(team)
             println("Loaded team ${serializedTeam.name}")
         }
         teamManager.teams = teams

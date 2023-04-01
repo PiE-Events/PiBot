@@ -12,7 +12,7 @@ class Team(val voiceChannel: VoiceChannel, val textChannel: TextChannel, val nam
     val members: MutableList<User> = ArrayList()
     var clueNumber = 0
     private val charPool : List<Char> = ('A'..'Z') + ('0'..'9')
-    val id = List(5) { charPool.random() }.joinToString("")
+    var id = List(5) { charPool.random() }.joinToString("")
     init {
         redisson.getTopic("mchunt").publish("ID:$id,$name")
     }
@@ -61,6 +61,6 @@ class Team(val voiceChannel: VoiceChannel, val textChannel: TextChannel, val nam
     }
 
     fun serialize(): SerializedTeam {
-        return SerializedTeam(voiceChannel.idLong, textChannel.idLong, name, leader.idLong)
+        return SerializedTeam(voiceChannel.idLong, textChannel.idLong, name, leader.idLong, id)
     }
 }
