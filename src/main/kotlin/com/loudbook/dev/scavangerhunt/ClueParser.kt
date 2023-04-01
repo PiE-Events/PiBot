@@ -28,14 +28,12 @@ class ClueParser(private val manager: ClueManager, jda: JDA) {
                 continue
             }
 
-            val answers: MutableList<String>
-            try {
-                answers = ArrayList(
+            val answers: MutableList<String> = try {
+                ArrayList(
                     str.split("[Answer]")[1].split("|")
                 )
             } catch (e: Exception) {
-                println("Error parsing answers!")
-                continue
+                mutableListOf()
             }
             for ((i, answer) in answers.withIndex()) {
                 answers[i] = answer.trim()
