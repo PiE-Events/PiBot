@@ -11,6 +11,10 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
     private val map = mutableMapOf<User, Team>()
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
+        if (event.channel.id != "1087493041419464794") {
+            event.hook.sendMessage("This command can only be used in <#1087493041419464794>!").queue()
+            return
+        }
         if (event.interaction.name == "teamcreate") {
             if (clueManager.started) {
                 event.hook.sendMessage("The event has started already!").queue()

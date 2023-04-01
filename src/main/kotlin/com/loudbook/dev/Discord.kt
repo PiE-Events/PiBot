@@ -25,7 +25,7 @@ class Discord {
             .enableIntents(GatewayIntent.GUILD_MEMBERS)
             .setMemberCachePolicy(MemberCachePolicy.ALL)
             .build().awaitReady()
-/*//        jda.updateCommands().queue()
+//        jda.updateCommands().queue()
         jda.getGuildById(guildID)!!.updateCommands().addCommands(
             Commands.slash("teamcreate", "Create a team.")
                 .addOptions(OptionData(OptionType.STRING, "name", "The name of the team.").setRequired(true)),
@@ -46,7 +46,7 @@ class Discord {
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)),
             Commands.slash("pushteams", "Push the teams to Redis!.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)),
-            ).queue()*/
+            ).queue()
 
     }
     fun sendMCEmbed(sender: String, message: String) {
