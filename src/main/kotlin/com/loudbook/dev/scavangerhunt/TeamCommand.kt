@@ -28,7 +28,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
                 event.hook.sendMessage("Team names can only contain letters!").queue()
                 return
             }
-            if (event.interaction.options[0].asString.length > 100) {
+            if (event.interaction.options[0].asString.length > 16) {
                 event.hook.sendMessage("That name is long. Too long.").queue()
                 return
             }

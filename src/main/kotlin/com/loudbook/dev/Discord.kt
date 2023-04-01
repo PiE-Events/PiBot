@@ -3,6 +3,11 @@ package com.loudbook.dev
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
+import net.dv8tion.jda.api.interactions.commands.OptionType
+import net.dv8tion.jda.api.interactions.commands.build.Commands
+import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.utils.MemberCachePolicy
 import java.awt.Color
@@ -35,7 +40,7 @@ class Discord {
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.PRIORITY_SPEAKER)),
             Commands.slash("start", "Start the game.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)),
-            Commands.slash("reset", "Reset the game;")
+            Commands.slash("reset", "Reset the game.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)),
             Commands.slash("teamlist", "List the members in your team.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.PRIORITY_SPEAKER)),
