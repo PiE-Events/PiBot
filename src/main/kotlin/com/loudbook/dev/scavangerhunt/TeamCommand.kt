@@ -59,7 +59,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
                 event.hook.sendMessage("Your team is full!").queue()
                 return
             }
-            event.hook.sendMessage("${event.interaction.options[0].asUser.asMention} you have been invited to join **${teamManager.getTeam(event.interaction.user)!!.name}**!")
+            event.hook.sendMessage("${event.interaction.options[0].asUser.asMention} you have been invited to join **${teamManager.getTeam(event.interaction.user)}**!")
                 .addActionRow(Button.success("accept", "Accept"))
                 .queue()
             map[event.interaction.options[0].asUser] = teamManager.getTeam(event.interaction.user)!!
