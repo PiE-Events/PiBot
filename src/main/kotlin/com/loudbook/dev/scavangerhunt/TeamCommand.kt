@@ -11,11 +11,8 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
     private val map = mutableMapOf<User, Team>()
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
-        if (event.channel.id != "1087493041419464794") {
-            event.hook.sendMessage("This command can only be used in <#1087493041419464794>!").queue()
-            return
-        }
         if (event.interaction.name == "teamcreate") {
+            if (!checkBotCommands(event)) return
             if (clueManager.started) {
                 event.hook.sendMessage("The event has started already!").queue()
                 return
@@ -41,6 +38,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
             fileManager.save()
         }
         if (event.interaction.name == "invite") {
+            if (!checkBotCommands(event)) return
             if (clueManager.started) {
                 event.hook.sendMessage("The event has started already!").queue()
                 return
@@ -63,6 +61,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
             map[event.interaction.options[0].asUser] = teamManager.getTeam(event.interaction.user)!!
         }
         if (event.interaction.name == "teamleave") {
+            if (!checkBotCommands(event)) return
             if (teamManager.getTeam(event.interaction.user) == null) {
                 event.hook.sendMessage("You are not in a team!").queue()
                 return
@@ -87,6 +86,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
             fileManager.save()
         }
         if (event.interaction.name == "teamlist") {
+            if (!checkBotCommands(event)) return
             if (teamManager.getTeam(event.interaction.user) == null) {
                 event.hook.sendMessage("You are not in a team!").queue()
                 return
@@ -95,6 +95,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
                     teamManager.getTeam(event.interaction.user)!!.members.joinToString("\n • ") { it.name }).queue()
         }
         if (event.interaction.name == "allteamlist") {
+            if (!checkBotCommands(event)) return
             event.hook.sendMessage("All teams:\n • " +
                     teamManager.teams.joinToString("\n • ") { it.name }).queue()
         }
@@ -103,6 +104,23 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
                 redissonClient.getTopic("mchunt").publish("ID:${team.id},${team.name}")
             }
             event.hook.sendMessage("Pushed teams to Redis!").queue()
+        }
+        if (event.interaction.name == "removeteam") {
+            if (teamManager.getTeamByName(event.interaction.options[0].asString) == null) {
+                event.hook.sendMessage("That team does not exist!").queue()
+                return
+            }
+            val team = teamManager.getTeamByName(event.interaction.options[0].asString)!!
+            team.members.forEach {
+                event.guild!!.getTextChannelById("1087493041419464794")!!.sendMessage(
+                    "${it.asMention} you have been removed from **${it.name}** for: `${event.interaction.options[1].asString}`!"
+                ).queue()
+            }
+            team.clearMembers()
+            teamManager.teams.remove(team)
+            team.textChannel.delete().queue()
+            team.voiceChannel.delete().queue()
+            event.hook.sendMessage("Removed team **${team.name}**!").queue()
         }
     }
 
@@ -123,5 +141,13 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
         event.reply("${ map[event.interaction.user]!!.leader.asMention}, ${event.user.name} has joined **${map[event.interaction.user]!!.name}**!").queue()
         map.remove(event.interaction.user)
         fileManager.save()
+    }
+
+    private fun checkBotCommands(event: SlashCommandInteractionEvent): Boolean {
+        if (event.channel.id != "1087493041419464794") {
+            event.hook.sendMessage("This command can only be used in <#1087493041419464794>!").queue()
+            return false
+        }
+        return true
     }
 }

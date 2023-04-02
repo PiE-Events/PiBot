@@ -82,4 +82,13 @@ class TeamManager(val jda: JDA, val redisson: RedissonClient) {
         }
         return null
     }
+
+    fun getTeamByName(name: String): Team? {
+        for (team in teams) {
+            if (team.name == name) {
+                return team
+            }
+        }
+        return null
+    }
 }

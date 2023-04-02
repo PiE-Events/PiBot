@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.requests.GatewayIntent
+import net.dv8tion.jda.api.utils.ChunkingFilter
 import net.dv8tion.jda.api.utils.MemberCachePolicy
 import java.awt.Color
 
@@ -20,13 +21,14 @@ class Discord {
     }
     fun connect(token: String) {
         jda = JDABuilder.createDefault(token)
+            .setChunkingFilter(ChunkingFilter.ALL)
             .enableIntents(GatewayIntent.MESSAGE_CONTENT)
             .setEnableShutdownHook(false)
             .enableIntents(GatewayIntent.GUILD_MEMBERS)
             .setMemberCachePolicy(MemberCachePolicy.ALL)
             .build().awaitReady()
 //        jda.updateCommands().queue()
-        jda.getGuildById(guildID)!!.updateCommands().addCommands(
+/*        jda.getGuildById(guildID)!!.updateCommands().addCommands(
             Commands.slash("teamcreate", "Create a team.")
                 .addOptions(OptionData(OptionType.STRING, "name", "The name of the team.").setRequired(true)),
             Commands.slash("teamleave", "Leave your team."),
@@ -46,7 +48,11 @@ class Discord {
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)),
             Commands.slash("pushteams", "Push the teams to Redis!.")
                 .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)),
-            ).queue()
+            Commands.slash("removeteam", "Remove a team.")
+                .addOptions(OptionData(OptionType.STRING, "name", "The name of the team.").setRequired(true))
+                .addOptions(OptionData(OptionType.STRING, "reason", "Reason of removal.").setRequired(true))
+                .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)),
+            ).queue()*/
 
     }
     fun sendMCEmbed(sender: String, message: String) {

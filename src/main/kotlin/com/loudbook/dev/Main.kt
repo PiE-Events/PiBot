@@ -90,7 +90,7 @@ class Main {
                         val team = teamManager.getTeam(teamID)
                         if (team != null) {
                             println("Team $teamID finished from Minecraft!")
-                            clueManager.executeAnswer(team, clueManager.clues.first { it.number == team.clueNumber })
+                            clueManager.executeAnswer(team, clueManager.clues.first { it.number == team.clueNumber }, true)
                         } else {
                             println("Team $teamID not found")
                         }
