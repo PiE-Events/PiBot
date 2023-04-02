@@ -55,6 +55,10 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
                 event.hook.sendMessage("That user is already in a team!").queue()
                 return
             }
+            if (teamManager.getTeam(event.interaction.options[0].asUser)!!.members.size >= 3) {
+                event.hook.sendMessage("Your team is full!").queue()
+                return
+            }
             event.hook.sendMessage("${event.interaction.options[0].asUser.asMention} you have been invited to join **${teamManager.getTeam(event.interaction.user)!!.name}**!")
                 .addActionRow(Button.success("accept", "Accept"))
                 .queue()
