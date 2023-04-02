@@ -71,7 +71,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
                 event.hook.sendMessage("You are the leader of this team, and it has been disbanded!").queue()
                 team.members.forEach {
                     event.interaction.channel.sendMessage(
-                        "${it.asMention} you have been removed from **${team.name}**!"
+                        "${it.asMention}, you have been removed from **${team.name}**!"
                     ).queue()
                 }
                 team.clearMembers()
@@ -113,7 +113,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
             val team = teamManager.getTeamByName(event.interaction.options[0].asString)!!
             team.members.forEach {
                 event.guild!!.getTextChannelById("1087493041419464794")!!.sendMessage(
-                    "${it.asMention} you have been removed from **${it.name}** for: `${event.interaction.options[1].asString}`!"
+                    "${it.asMention}, your team, **${it.name}**, has been disbanded for: `${event.interaction.options[1].asString}`!"
                 ).queue()
             }
             team.clearMembers()
