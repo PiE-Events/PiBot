@@ -9,6 +9,10 @@ class ResetEventCommand(private val teamManager: TeamManager,
                         private val clueParser: ClueParser) : ListenerAdapter() {
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if (event.interaction.name == "reset") {
+            event.deferReply().queue()
+            event.hook.sendMessage("This command is currently disabled.").queue()
+            return
+
             for (team in teamManager.teams) {
                 team.textChannel.delete().complete()
                 team.voiceChannel.delete().complete()

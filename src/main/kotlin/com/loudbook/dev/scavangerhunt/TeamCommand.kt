@@ -10,8 +10,8 @@ import org.redisson.api.RedissonClient
 class TeamCommand(private val teamManager: TeamManager, private val clueManager: ClueManager, private val fileManager: FileManager, private val redissonClient: RedissonClient) : ListenerAdapter() {
     private val map = mutableMapOf<User, Team>()
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
-        event.deferReply().queue()
         if (event.interaction.name == "teamcreate") {
+            event.deferReply().queue()
             if (!checkBotCommands(event)) return
             if (clueManager.started) {
                 event.hook.sendMessage("The event has started already!").queue()
@@ -38,6 +38,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
             fileManager.save()
         }
         if (event.interaction.name == "invite") {
+            event.deferReply().queue()
             if (!checkBotCommands(event)) return
             if (clueManager.started) {
                 event.hook.sendMessage("The event has started already!").queue()
@@ -66,6 +67,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
             map[event.interaction.options[0].asUser] = teamManager.getTeam(event.interaction.user)!!
         }
         if (event.interaction.name == "teamleave") {
+            event.deferReply().queue()
             if (!checkBotCommands(event)) return
             if (teamManager.getTeam(event.interaction.user) == null) {
                 event.hook.sendMessage("You are not in a team!").queue()
@@ -91,6 +93,7 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
             fileManager.save()
         }
         if (event.interaction.name == "teamlist") {
+            event.deferReply().queue()
             if (!checkBotCommands(event)) return
             if (teamManager.getTeam(event.interaction.user) == null) {
                 event.hook.sendMessage("You are not in a team!").queue()
@@ -100,17 +103,20 @@ class TeamCommand(private val teamManager: TeamManager, private val clueManager:
                     teamManager.getTeam(event.interaction.user)!!.members.joinToString("\n • ") { it.name }).queue()
         }
         if (event.interaction.name == "allteamlist") {
+            event.deferReply().queue()
             if (!checkBotCommands(event)) return
             event.hook.sendMessage("All teams:\n • " +
                     teamManager.teams.joinToString("\n • ") { it.name }).queue()
         }
         if (event.interaction.name == "pushteams") {
+            event.deferReply().queue()
             for (team in teamManager.teams) {
                 redissonClient.getTopic("mchunt").publish("ID:${team.id},${team.name}")
             }
             event.hook.sendMessage("Pushed teams to Redis!").queue()
         }
         if (event.interaction.name == "removeteam") {
+            event.deferReply().queue()
             if (teamManager.getTeamByName(event.interaction.options[0].asString) == null) {
                 event.hook.sendMessage("That team does not exist!").queue()
                 return
